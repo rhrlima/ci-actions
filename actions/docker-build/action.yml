@@ -41,7 +41,7 @@ runs:
   using: composite
 
   env:
-    IMAGE_PATH="${{ inputs.IMAGE_REGISTRY }}/${{ inputs.IMAGE_NAME }}"
+    IMAGE_PATH: "${{ inputs.IMAGE_REGISTRY }}/${{ inputs.IMAGE_NAME }}"
 
   steps:
     - name: Checkout repository
