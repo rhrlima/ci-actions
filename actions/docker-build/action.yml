@@ -31,17 +31,17 @@ inputs:
     description: Path to the Dockerfile
     required: false
     default: Dockerfile
-  
+
   PUBLISH:
     description: Publish the image to the registry
     required: false
     default: true
 
+env:
+  IMAGE_PATH: "${{ inputs.IMAGE_REGISTRY }}/${{ inputs.IMAGE_NAME }}"
+
 runs:
   using: composite
-
-  env:
-    IMAGE_PATH: "${{ inputs.IMAGE_REGISTRY }}/${{ inputs.IMAGE_NAME }}"
 
   steps:
     - name: Checkout repository
