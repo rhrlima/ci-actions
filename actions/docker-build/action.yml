@@ -6,7 +6,7 @@ inputs:
   IMAGE_NAME:
     description: Name of the image to be built
     required: false
-    default: "ghcr.io/${{ github.repository }}"
+    default: "${{ github.repository }}"
 
   IMAGE_TAG:
     description: Tag of the image to be built
