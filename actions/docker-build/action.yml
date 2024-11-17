@@ -37,9 +37,6 @@ inputs:
     required: false
     default: true
 
-env:
-  IMAGE_PATH: "${{ inputs.IMAGE_REGISTRY }}/${{ inputs.IMAGE_NAME }}"
-
 runs:
   using: composite
 
@@ -62,6 +59,8 @@ runs:
     - name: Image Tagging
       if: ${{ inputs.PUBLISH }}
       shell: bash
+      env:
+        IMAGE_PATH: ${{ inputs.IMAGE_REGISTRY }}/${{ inputs.IMAGE_NAME }}
       run: |
         docker tag docker_image:latest ${IMAGE_PATH}:latest
         docker tag docker_image:latest ${IMAGE_PATH}:${{ inputs.IMAGE_TAG }}
@@ -69,6 +68,8 @@ runs:
     - name: Push Image to Registry
       if: ${{ inputs.PUBLISH }}
       shell: bash
+      env:
+        IMAGE_PATH: ${{ inputs.IMAGE_REGISTRY }}/${{ inputs.IMAGE_NAME }}
       run: |
         docker push ${IMAGE_PATH}:latest
         docker push ${IMAGE_PATH}:${{ inputs.IMAGE_TAG }}
