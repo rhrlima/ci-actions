@@ -6,12 +6,12 @@ inputs:
   IMAGE_NAME:
     description: Name of the image to be built
     required: false
-    default: "latest"
+    default: "ghcr.io/${{ github.repository }}"
 
   IMAGE_TAG:
     description: Tag of the image to be built
     required: false
-    default: "ghcr.io/${{ github.repository }}"
+    default: "latest"
 
   IMAGE_REGISTRY:
     description: Registry to push the image
