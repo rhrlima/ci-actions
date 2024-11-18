@@ -1,0 +1,25 @@
+name: Bump Version
+
+description: Updates the Semantic Version of the project.
+
+runs:
+  using: composite
+
+  steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Generate Semantic Version
+      id: semver
+      uses: rapidstack/PR-Label-Semver-Action@v1.3.6
+
+    - name: Set Version
+      shell: bash
+      run: echo "APP_VERSION=v${{ steps.semver.outputs.string }}" >> $GITHUB_ENV
+
+    - name: Set SemVer in Github Environment
+      shell: bash
+      run: gh variable set APP_VERSION --body "$APP_VERSION"
+      env:
+        APP_VERSION: ${{ env.APP_VERSION }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
