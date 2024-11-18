@@ -1,0 +1,40 @@
+name: Create Tag
+
+description: Create a new Release Tag
+
+inputs:
+  TAG:
+    description: Tag to be created
+    required: true
+
+outputs:
+  created:
+    description: Whether the tag was created
+    value: ${{ steps.check2.outputs.exists }}
+
+runs:
+  using: composite
+
+  steps:
+    - name: Check Tag Before
+      uses: action-pack/tag-exists@v1
+      id: check1
+      with:
+        tag: ${{ inputs.TAG }}
+
+    - name: Checkout repository
+      if: ${{ steps.check1.outputs.exists == 'false' }}
+      uses: actions/checkout@v4
+
+    - name: Create Tag
+      if: ${{ steps.check1.outputs.exists == 'false' }}
+      shell: bash
+      run: |
+        git tag ${{ inputs.TAG }}
+        git push --tags
+
+    - name: Check Tag After
+      uses: action-pack/tag-exists@v1
+      id: check2
+      with:
+        tag: ${{ inputs.TAG }}
