@@ -2,11 +2,10 @@ name: Bump Version
 
 description: Updates the Semantic Version of the project.
 
-# on:
-#   workflow_call:
-#     secrets:
-#       GITHUB_TOKEN:
-#         required: true
+inputs:
+  GITHUB_TOKEN:
+    description: 'A GitHub Token with at least repo scope'
+    required: true
 
 runs:
   using: composite
@@ -28,4 +27,4 @@ runs:
       run: gh variable set APP_VERSION --body "$APP_VERSION"
       env:
         APP_VERSION: ${{ env.APP_VERSION }}
-        # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_TOKEN: ${{ inputs.GITHUB_TOKEN }}
