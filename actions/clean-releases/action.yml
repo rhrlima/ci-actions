@@ -1,0 +1,50 @@
+name: Clean Releases
+
+description: Clean up Docker images and GitHub tags
+
+on:
+  workflow_call:
+    inputs:
+      CLEAN_IMAGES:
+        description: Whether to clean Docker images
+        type: boolean
+        default: true
+
+      CLEAN_TAGS:
+        description: Whether to clean GitHub tags
+        type: boolean
+        default: true
+
+      MIN_RELEASES:
+        description: Minimum number of releases to keep
+        type: integer
+        default: 5
+
+jobs:
+  clean_docker_images:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to Docker Registry
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Clean Docker Images
+        if: ${{ inputs.CLEAN_IMAGES }}
+        run: |
+          docker images | sort -nr
+          # docker images | grep 'your_image_name:v*' | awk '{print $3}' | sort -nr | tail -n +${{ inputs.MIN_RELEASES }} | xargs docker rmi
+
+  clean_github_tags:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Clean GitHub Tags
+        if: ${{ inputs.CLEAN_TAGS }}
+        run: |
+          git tag -l | sort -nr
+          # | xargs git tag -d
+          # git push origin --delete $(git tag -l --sort=-version:numeric | tail -n +${{ inputs.MIN_RELEASES }})
