@@ -48,12 +48,14 @@ runs:
 
     - name: Clean Docker Images
       if: ${{ inputs.CLEAN_IMAGES }}
+      shell: bash
       run: |
         docker images | sort -nr
         # docker images | grep 'your_image_name:v*' | awk '{print $3}' | sort -nr | tail -n +${{ inputs.MIN_RELEASES }} | xargs docker rmi
 
     - name: Clean GitHub Tags
       if: ${{ inputs.CLEAN_TAGS }}
+      shell: bash
       run: |
         git tag -l | sort -nr
         # | xargs git tag -d
