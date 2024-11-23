@@ -48,7 +48,7 @@ runs:
     - name: Create Pull Request
       uses: peter-evans/create-pull-request@v6
       with:
-        token: ${{ secrets.DEPLOY_TOKEN }}
+        token: ${{ inputs.GITHUB_TOKEN }}
         branch: 'release/${{ inputs.IMAGE_NAME }}-${{ inputs.IMAGE_TAG }}'
         commit-message: 'Update image ${{ inputs.IMAGE_NAME }} to tag ${{ inputs.IMAGE_TAG }}'
         title: ${{ inputs.PR_TITLE }}
