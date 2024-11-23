@@ -1,0 +1,59 @@
+name: Deploy Send
+
+description: Deploy to environment
+
+inputs:
+  IMAGE_NAME:
+    description: Name of the image
+    required: false
+    default: "${{ github.repository }}"
+
+  IMAGE_TAG:
+    description: Tag of the image
+    required: false
+    default: "latest"
+
+  REPO_NAME:
+    description: Name of the repo with the manifests
+    required: true
+
+  MANIFEST_PATH:
+    description: Path to the YAML manifest to update the image
+    required: true
+
+  GITHUB_TOKEN:
+    description: PAT token with access to the manifest repo
+    required: false
+
+  EVENT_TYPE:
+    description: Name of the event sent to the remote workflow
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Summary
+      shell: bash
+      run: |
+        echo "EVENT TYPE: ${{ inputs.EVENT_TYPE }}"
+        echo "IMAGE: ${{ inputs.IMAGE_NAME }}:${{ inputs.IMAGE_TAG }}"
+        echo "REPOSITORY: ${{ inputs.REPO_NAME }}"
+        echo "MANIFEST PATH: ${{ inputs.MANIFEST_PATH }}"
+
+    - name: Repository Dispatch
+      uses: peter-evans/repository-dispatch@v3
+      with:
+        token: ${{ inputs.GITHUB_TOKEN }}
+        repository: ${{ inputs.REPO_NAME }}
+        event-type: ${{ inputs.EVENT_TYPE }}
+        client-payload: |
+          {
+            "event_type": "${{ inputs.EVENT_TYPE }}",
+            "image_tag": "${{ inputs.IMAGE_TAG }}",
+            "image_name": "${{ inputs.IMAGE_NAME }}",
+            "manifest_path": "${{ inputs.MANIFEST_PATH }}",
+            "latest_release": "${{ env.RELEASE_LINK }}"
+          }

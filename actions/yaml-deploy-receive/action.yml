@@ -1,0 +1,62 @@
+name: Deploy Receive
+
+description: |
+  Deploy an image to a Kubernetes cluster by updating the image tag in a manifest file.
+
+inputs:
+  IMAGE_TAG:
+    description: Image tag
+    required: true
+    default: latest
+    type: string
+
+  IMAGE_NAME:
+    description: Image name
+    required: true
+    type: string
+
+  MANIFEST_PATH:
+    description: Path to the YAML manifest
+    required: true
+    type: string
+
+  PR_TITLE:
+    description: Title of the Pull Request
+    required: true
+    default: Deploy
+    type: string
+
+  GITHUB_TOKEN:
+    description: GitHub token
+    required: true
+    type: string
+
+runs:
+  using: composite
+  steps:
+    - name: Summary
+      shell: bash
+      run: echo "Deploying image ${{ inputs.IMAGE_NAME }}:${{ inputs.IMAGE_TAG }} in ${{ inputs.MANIFEST_PATH }}"
+
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Update image tag
+      shell: bash
+      run: sed -i "s|${{ inputs.IMAGE_NAME }}:.*|${{ inputs.IMAGE_NAME }}:${{ inputs.IMAGE_TAG }}|" ${{ inputs.MANIFEST_PATH }}
+
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v6
+      with:
+        token: ${{ secrets.DEPLOY_TOKEN }}
+        branch: 'release/${{ inputs.IMAGE_NAME }}-${{ inputs.IMAGE_TAG }}'
+        commit-message: 'Update image ${{ inputs.IMAGE_NAME }} to tag ${{ inputs.IMAGE_TAG }}'
+        title: ${{ inputs.PR_TITLE }}
+        delete-branch: true
+
+    # requires main branch to be protected
+    - name: Enable Pull Request Automerge
+      shell: bash
+      run: gh pr merge --merge --auto "${{ env.PULL_REQUEST_NUMBER }}"
+      env:
+        GH_TOKEN: ${{ inputs.GITHUB_TOKEN }}
